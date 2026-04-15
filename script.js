@@ -4,6 +4,69 @@
 
 document.addEventListener('DOMContentLoaded', function () {
 
+  // ---- Typing Animation ----
+  const typingTexts = [
+    'Product Support Engineer',
+    'Customer Success Specialist',
+    'Cloud Management Expert',
+    'Web Hosting Professional',
+    'LLM Automation Enthusiast'
+  ];
+  const typingElement = document.querySelector('.typing-text');
+  const cursorElement = document.querySelector('.typing-cursor');
+  let textIndex = 0;
+  let charIndex = 0;
+  let isDeleting = false;
+  let typingSpeed = 80;
+
+  function typeText() {
+    const currentText = typingTexts[textIndex];
+    
+    if (isDeleting) {
+      typingElement.textContent = currentText.substring(0, charIndex - 1);
+      charIndex--;
+      typingSpeed = 40;
+    } else {
+      typingElement.textContent = currentText.substring(0, charIndex + 1);
+      charIndex++;
+      typingSpeed = 80;
+    }
+
+    if (!isDeleting && charIndex === currentText.length) {
+      typingSpeed = 2000;
+      isDeleting = true;
+    } else if (isDeleting && charIndex === 0) {
+      isDeleting = false;
+      textIndex = (textIndex + 1) % typingTexts.length;
+      typingSpeed = 500;
+    }
+
+    setTimeout(typeText, typingSpeed);
+  }
+
+  typeText();
+
+  // ---- Theme Toggle ----
+  const themeToggle = document.querySelector('.theme-toggle');
+  const html = document.documentElement;
+  
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  html.setAttribute('data-theme', savedTheme);
+  updateThemeIcon(savedTheme);
+
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = html.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    
+    html.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+  });
+
+  function updateThemeIcon(theme) {
+    themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+  }
+
   // ---- Scroll Reveal ----
   const observer = new IntersectionObserver(
     (entries) => {
@@ -72,6 +135,25 @@ document.addEventListener('DOMContentLoaded', function () {
       hero.style.backgroundPositionY = `${scrolled * 0.3}px`;
     }
   }, { passive: true });
+
+  // ---- Back to Top Button ----
+  const backToTop = document.createElement('button');
+  backToTop.className = 'back-to-top';
+  backToTop.innerHTML = '↑';
+  backToTop.setAttribute('aria-label', 'Back to top');
+  document.body.appendChild(backToTop);
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 400) {
+      backToTop.classList.add('visible');
+    } else {
+      backToTop.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  backToTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
 
   console.log('Portfolio loaded ✔');
 });
